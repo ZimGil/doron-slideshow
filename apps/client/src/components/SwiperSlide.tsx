@@ -1,7 +1,8 @@
+import React from "react";
 import styled from "styled-components";
-import { SwiperSlide } from "swiper/react";
+import { SwiperSlide, SwiperSlideProps } from "swiper/react";
 
-export const DoronSlide = styled(SwiperSlide)`
+export const DoronSlide: React.FC<SwiperSlideProps> = styled(SwiperSlide)`
   display: flex;
   justify-content: center;
   align-items: center;

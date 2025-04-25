@@ -21,7 +21,7 @@ export const DoronImageName: React.FC = () => {
 
 
   const handleNewImageName = () => {
-    // @ts-expect-errpr visibleSlides actually exists
+    // @ts-expect-error visibleSlides actually exists
     setImageName(swiper.visibleSlides?.[0]?.dataset.name)
   }
 

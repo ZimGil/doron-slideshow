@@ -3,7 +3,7 @@ import { useSwiper } from "swiper/react";
 
 const AUTOPLAY_INTERVAL = 1000;
 
-interface AutoplayContextValue {
+export interface AutoplayContextValue {
     isAutoplay: boolean;
     toggleAutoplay: () => void
     startAutoplay: () => void
@@ -14,7 +14,7 @@ export const AutoplayContext = createContext<AutoplayContextValue | null>(null);
 
 export const AutoplayProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [isAutoplay, setIsAutoplay] = useState(true);
-    const autoplayIntervalRef = React.useRef<number | null>(null);
+    const autoplayIntervalRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
     const swiper = useSwiper();
 
     const startAutoplay = useCallback(() => {
