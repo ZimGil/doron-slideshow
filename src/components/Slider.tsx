@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Autoplay, Navigation, Virtual } from 'swiper/modules';
+import { Autoplay, Virtual } from 'swiper/modules';
 import { Swiper } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import { DoronSlide } from './SwiperSlide';
 import { DoronImage } from './Image';
 import { DoronImageName } from './ImageName';
+import { DoronNavigation } from './Navigation';
 
 interface Photo {
   url: string;
@@ -29,14 +30,13 @@ export const DoronSlider: React.FC = () => {
 
   return (
     <Swiper
-      modules={[Autoplay, Navigation, Virtual]}
+      modules={[Autoplay, Virtual]}
       virtual={{
         enabled: true,
         addSlidesBefore: 5,
         addSlidesAfter: 5
       }}
       lazyPreloadPrevNext={10}
-      navigation
       slidesPerView={1}
       onReachEnd={handleReachEnd}
       // autoplay={{ delay: 1000 }}
@@ -51,6 +51,7 @@ export const DoronSlider: React.FC = () => {
         </DoronSlide >
       ))}
       <DoronImageName />
+      <DoronNavigation />
     </Swiper>
   );
 };
