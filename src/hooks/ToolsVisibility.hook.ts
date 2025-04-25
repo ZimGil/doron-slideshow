@@ -4,7 +4,11 @@ interface UseToolsVisibility {
     isVisible: boolean;
 }
 
+
+const force = false; // Set to true to force the tools to be always visible
+
 export const useToolsVisibility = (): UseToolsVisibility => {
+    if (force) return { isVisible: true }
     const [isVisible, setVisible] = useState(false);
     const timerRef = useRef<number | null>(null);
 
@@ -18,8 +22,10 @@ export const useToolsVisibility = (): UseToolsVisibility => {
 
     useEffect(() => {
         window.addEventListener("mousemove", handleMouseMove);
+        window.addEventListener("click", handleMouseMove);
         return () => {
             window.removeEventListener("mousemove", handleMouseMove);
+            window.removeEventListener("click", handleMouseMove);
             if (timerRef.current) clearTimeout(timerRef.current);
         };
     }, []);
