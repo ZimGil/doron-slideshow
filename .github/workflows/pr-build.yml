@@ -1,0 +1,35 @@
+name: PR Check - Build (affected)
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  actions:  read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pr-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+
+      # Derive NX_BASE / NX_HEAD so nx affected knows what changed
+      - uses: nrwl/nx-set-shas@v4  # official action&#8203;:contentReference[oaicite:0]{index=0}
+
+      # Run builds only for affected projects
+      - run: npx nx affected --target=build --parallel
