@@ -1,6 +1,6 @@
-import { useState } from "react";
-import styled from "styled-components";
-import { useSwiper } from "swiper/react";
+import { useState } from 'react';
+import styled from 'styled-components';
+import { useSwiper } from 'swiper/react';
 
 export const StyledImageName = styled.div`
   position: absolute;
@@ -13,22 +13,19 @@ export const StyledImageName = styled.div`
   padding: 1px 8px;
   font-size: 1.25rem;
   overflow-wrap: anywhere;
-`
+`;
 
 export const DoronImageName: React.FC = () => {
-  const swiper = useSwiper()
-  const [imageName, setImageName] = useState<string>('')
-
+  const swiper = useSwiper();
+  const [imageName, setImageName] = useState<string>('');
 
   const handleNewImageName = () => {
     // @ts-expect-error visibleSlides actually exists
-    setImageName(swiper.visibleSlides?.[0]?.dataset.name)
-  }
+    setImageName(swiper.visibleSlides?.[0]?.dataset.name);
+  };
 
-  swiper.on('slidesUpdated', handleNewImageName)
-  swiper.on('slideChange', handleNewImageName)
+  swiper.on('slidesUpdated', handleNewImageName);
+  swiper.on('slideChange', handleNewImageName);
 
-
-  return <StyledImageName>{imageName}</ StyledImageName>
-}
-
+  return <StyledImageName>{imageName}</StyledImageName>;
+};

@@ -1,9 +1,7 @@
-import { DoronSlider } from "./components/Slider"
+import { DoronSlider } from './components/Slider';
 
 function App() {
-  return (
-    <DoronSlider />
-  )
+  return <DoronSlider />;
 }
 
-export default App
+export default App;

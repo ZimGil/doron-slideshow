@@ -1,35 +1,34 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from 'react';
 
 interface UseToolsVisibility {
-    isVisible: boolean;
+  isVisible: boolean;
 }
-
 
 const force = false; // Set to true to force the tools to be always visible
 
 export const useToolsVisibility = (): UseToolsVisibility => {
-    const [isVisible, setVisible] = useState(false);
-    const timerRef = useRef<number | null>(null);
+  const [isVisible, setVisible] = useState(false);
+  const timerRef = useRef<number | null>(null);
 
-    const handleMouseMove = () => {
-        setVisible(true);
-        if (timerRef.current) {
-            clearTimeout(timerRef.current);
-        }
-        timerRef.current = window.setTimeout(() => setVisible(false), 2000);
+  const handleMouseMove = () => {
+    setVisible(true);
+    if (timerRef.current) {
+      clearTimeout(timerRef.current);
+    }
+    timerRef.current = window.setTimeout(() => setVisible(false), 2000);
+  };
+
+  useEffect(() => {
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('click', handleMouseMove);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('click', handleMouseMove);
+      if (timerRef.current) clearTimeout(timerRef.current);
     };
+  }, []);
 
-    useEffect(() => {
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("click", handleMouseMove);
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("click", handleMouseMove);
-            if (timerRef.current) clearTimeout(timerRef.current);
-        };
-    }, []);
+  if (force) return { isVisible: true };
 
-    if (force) return { isVisible: true }
-
-    return { isVisible };
+  return { isVisible };
 };
