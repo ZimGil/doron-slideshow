@@ -1,15 +1,19 @@
 {
-  "name": "my-vue-app",
-  "private": true,
+  "name": "@react-monorepo/source",
   "version": "0.0.0",
-  "type": "module",
+  "license": "MIT",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
-    "preview": "vite preview"
+    "build": "nx run-many --target=build --all --parallel",
+    "dev": "nx run-many --target=dev --all --parallel",
+    "lint": "nx run-many --target=lint --all --parallel",
+    "test": "nx run-many --target=test --all --parallel",
+    "typecheck": "nx run-many --target=typecheck --all --parallel",
+    "format": "nx format:write"
   },
+  "private": true,
   "dependencies": {
+    "react-is": "19.0.0",
+    "react-router-dom": "6.29.0",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource/roboto": "^5.2.5",
@@ -22,6 +26,32 @@
     "swiper": "^11.2.6"
   },
   "devDependencies": {
+    "@nx/eslint": "20.8.1",
+    "@nx/eslint-plugin": "20.8.1",
+    "@nx/js": "20.8.1",
+    "@nx/react": "20.8.1",
+    "@nx/vite": "20.8.1",
+    "@nx/web": "20.8.1",
+    "@nx/workspace": "20.8.1",
+    "@swc-node/register": "~1.9.1",
+    "@swc/cli": "~0.6.0",
+    "@swc/core": "~1.5.7",
+    "@swc/helpers": "~0.5.11",
+    "@types/node": "^20.0.0",
+    "@types/react-is": "19.0.0",
+    "@types/styled-components": "5.1.26",
+    "@vitest/ui": "^3.0.0",
+    "babel-plugin-styled-components": "1.10.7",
+    "eslint-config-prettier": "^10.0.0",
+    "eslint-plugin-import": "2.31.0",
+    "eslint-plugin-jsx-a11y": "6.10.1",
+    "eslint-plugin-react": "7.35.0",
+    "jiti": "2.4.2",
+    "jsdom": "~22.1.0",
+    "nx": "20.8.1",
+    "prettier": "^2.6.2",
+    "tslib": "^2.3.0",
+    "vitest": "^3.0.0",
     "@eslint/js": "^9.22.0",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
@@ -33,5 +63,8 @@
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.26.1",
     "vite": "^6.3.1"
-  }
+  },
+  "workspaces": [
+    "apps/*"
+  ]
 }

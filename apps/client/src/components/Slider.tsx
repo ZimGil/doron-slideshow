@@ -22,17 +22,20 @@ export const DoronSlider: React.FC = () => {
   }, []);
 
   const fetchPhotos = () => {
-    const newPhotos = Array.from({ length: 20 }, (_, idx) => ({ url: `https://cataas.com/cat?${Math.random()}&idx=${idx}`, name: `This is the image name: ${Math.random()}` }));
+    const newPhotos = Array.from({ length: 20 }, (_, idx) => ({
+      url: `https://cataas.com/cat?${Math.random()}&idx=${idx}`,
+      name: `This is the image name: ${Math.random()}`,
+    }));
     setPhotos((prev) => [...prev, ...newPhotos]);
   };
 
   const fadeFixer = (swiper: SwiperClass) => {
-    swiper.slides.forEach(slide => {
+    swiper.slides.forEach((slide) => {
       // @ts-expect-error progress is not defined in swiper types for some reason
       const p = Math.abs(slide.progress);
       slide.style.opacity = `${1 - Math.min(p, 1)}`; // 1 → 0
     });
-  }
+  };
 
   return (
     <Swiper
@@ -40,24 +43,20 @@ export const DoronSlider: React.FC = () => {
       virtual={{
         enabled: true,
         addSlidesBefore: 5,
-        addSlidesAfter: 5
+        addSlidesAfter: 5,
       }}
       lazyPreloadPrevNext={10}
-      effect='fade'
+      effect="fade"
       slidesPerView={1}
       speed={750}
       onReachEnd={fetchPhotos}
       onProgress={fadeFixer}
     >
-
       {photos.map(({ url, name }, idx) => (
         <DoronSlide virtualIndex={idx} data-name={name}>
-          <DoronImage
-            name={name}
-            url={url}
-          />
-          < div className="swiper-lazy-preloader" />
-        </DoronSlide >
+          <DoronImage name={name} url={url} />
+          <div className="swiper-lazy-preloader" />
+        </DoronSlide>
       ))}
       <AutoplayProvider>
         <DoronImageName />
