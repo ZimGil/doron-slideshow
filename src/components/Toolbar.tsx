@@ -44,7 +44,7 @@ export const DoronToolbar = () => {
             <IconButton onClick={() => toggleAutoplay()}>{isPlaying ? <PauseIcon /> : <PlayIcon />}</IconButton>
             <IconButton><DeleteIcon /></IconButton>
             <IconButton><ShuffleIcon /></IconButton>
-            <IconButton><RefreshIcon /></IconButton>
+            <IconButton onClick={() => window.location.reload()}><RefreshIcon /></IconButton>
         </ToolbarWrapper>
     )
 }
