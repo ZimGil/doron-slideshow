@@ -17,13 +17,6 @@ export const AutoplayProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     const autoplayIntervalRef = React.useRef<number | null>(null);
     const swiper = useSwiper();
 
-    useEffect(() => {
-        startAutoplay();
-        return () => {
-            stopAutoplay();
-        };
-    }, [swiper]);
-
     const startAutoplay = useCallback(() => {
         if (!isAutoplay) {
             setIsAutoplay(true);
@@ -46,6 +39,13 @@ export const AutoplayProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             autoplayIntervalRef.current = null;
         }
     }, [isAutoplay]);
+
+    useEffect(() => {
+        startAutoplay();
+        return () => {
+            stopAutoplay();
+        };
+    }, [swiper, startAutoplay, stopAutoplay]);
 
     const toggleAutoplay = useCallback(() => {
         if (isAutoplay) {
