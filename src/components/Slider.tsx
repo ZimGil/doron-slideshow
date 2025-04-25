@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Keyboard, Virtual } from 'swiper/modules';
+import { Virtual } from 'swiper/modules';
 import { Swiper } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import { DoronSlide } from './SwiperSlide';
@@ -7,6 +7,7 @@ import { DoronImage } from './Image';
 import { DoronImageName } from './ImageName';
 import { DoronNavigation } from './Navigation';
 import { DoronToolbar } from './Toolbar';
+import { AutoplayProvider } from '../providers/Autoplay.provider';
 
 interface Photo {
   url: string;
@@ -31,7 +32,7 @@ export const DoronSlider: React.FC = () => {
 
   return (
     <Swiper
-      modules={[Keyboard, Virtual]}
+      modules={[Virtual]}
       virtual={{
         enabled: true,
         addSlidesBefore: 5,
@@ -39,9 +40,9 @@ export const DoronSlider: React.FC = () => {
       }}
       lazyPreloadPrevNext={10}
       slidesPerView={1}
-      keyboard
       onReachEnd={handleReachEnd}
     >
+
       {photos.map(({ url, name }, idx) => (
         <DoronSlide virtualIndex={idx} data-name={name}>
           <DoronImage
@@ -51,9 +52,11 @@ export const DoronSlider: React.FC = () => {
           < div className="swiper-lazy-preloader" />
         </DoronSlide >
       ))}
-      <DoronImageName />
-      <DoronNavigation />
-      <DoronToolbar />
+      <AutoplayProvider>
+        <DoronImageName />
+        <DoronNavigation />
+        <DoronToolbar />
+      </AutoplayProvider>
     </Swiper>
   );
 };

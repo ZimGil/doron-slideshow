@@ -1,10 +1,13 @@
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import IconButton from "@mui/material/IconButton"
 import NavigateBeforeIcon from '@mui/icons-material/NavigateBefore';
 import NavigateNextIcon from '@mui/icons-material/NavigateNext';
 import { useSwiper } from "swiper/react";
 import styled from "styled-components";
 import { useToolsVisibility } from "../hooks/ToolsVisibility.hook";
+import { useAutoplay } from "../hooks/Autoplay.hook";
+
+const MANUAL_NAVIGATION_PAUSE_AUTOPLAY = true; // Set to true to pause autoplay when using manual navigation
 
 const NavigationWrapper = styled.div`
     position: absolute;
@@ -29,18 +32,39 @@ const NavigationWrapper = styled.div`
     }
 `;
 
-
 export const DoronNavigation: React.FC = () => {
     const swiper = useSwiper();
     const { isVisible } = useToolsVisibility();
+    const { stopAutoplay } = useAutoplay();
 
-    const handleNext = () => {
+    const handleNext = useCallback(() => {
         swiper.slideNext();
-    }
+        if (MANUAL_NAVIGATION_PAUSE_AUTOPLAY) {
+            stopAutoplay();
+        }
+    }, [swiper, stopAutoplay]);
 
-    const handlePrev = () => {
+    const handlePrev = useCallback(() => {
         swiper.slidePrev();
-    }
+        if (MANUAL_NAVIGATION_PAUSE_AUTOPLAY) {
+            stopAutoplay();
+        }
+    }, [swiper, stopAutoplay]);
+
+    useEffect(() => {
+        const handleKeyDown = (event: KeyboardEvent) => {
+            if (event.key === "ArrowRight") {
+                handleNext();
+            } else if (event.key === "ArrowLeft") {
+                handlePrev();
+            }
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [swiper, handleNext, handlePrev]);
+
 
     if (!isVisible) {
         return null;
