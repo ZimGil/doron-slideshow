@@ -24,8 +24,14 @@ export const DoronImageName: React.FC = () => {
     setImageName(swiper.visibleSlides?.[0]?.dataset.name);
   };
 
-  swiper.on('slidesUpdated', handleNewImageName);
-  swiper.on('slideChange', handleNewImageName);
+  useEffect(() => {
+    swiper.on('slidesUpdated', handleNewImageName);
+    swiper.on('slideChange', handleNewImageName);
 
+    return () => {
+      swiper.off('slidesUpdated', handleNewImageName);
+      swiper.off('slideChange', handleNewImageName);
+    };
+  }, [swiper, handleNewImageName]);
   return <StyledImageName>{imageName}</StyledImageName>;
 };
