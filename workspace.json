@@ -1,0 +1,115 @@
+{
+  "version": 1,
+  "projects": {
+    "react-app": {
+      "root": "apps/react-app",
+      "sourceRoot": "apps/react-app/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/web:build",
+          "options": {
+            "outputPath": "dist/apps/react-app",
+            "index": "apps/react-app/src/index.html",
+            "main": "apps/react-app/src/main.tsx",
+            "polyfills": "apps/react-app/src/polyfills.ts",
+            "tsConfig": "apps/react-app/tsconfig.app.json",
+            "assets": ["apps/react-app/src/favicon.ico", "apps/react-app/src/assets"],
+            "styles": ["apps/react-app/src/styles.css"],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/react-app/src/environments/environment.ts",
+                  "with": "apps/react-app/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "extractCss": true,
+              "namedChunks": false,
+              "aot": true,
+              "extractLicenses": true,
+              "vendorChunk": false,
+              "buildOptimizer": true,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "2mb",
+                  "maximumError": "5mb"
+                }
+              ]
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/web:dev-server",
+          "options": {
+            "buildTarget": "react-app:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "react-app:build:production"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/react-app/**/*.ts", "apps/react-app/**/*.tsx"]
+          }
+        }
+      }
+    },
+    "nest-app": {
+      "root": "apps/nest-app",
+      "sourceRoot": "apps/nest-app/src",
+      "projectType": "application",
+      "targets": {
+        "build": {
+          "executor": "@nrwl/node:build",
+          "options": {
+            "outputPath": "dist/apps/nest-app",
+            "main": "apps/nest-app/src/main.ts",
+            "tsConfig": "apps/nest-app/tsconfig.app.json",
+            "assets": ["apps/nest-app/src/assets"]
+          },
+          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "apps/nest-app/src/environments/environment.ts",
+                  "with": "apps/nest-app/src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "sourceMap": false,
+              "extractLicenses": true,
+              "externalDependencies": "all"
+            }
+          }
+        },
+        "serve": {
+          "executor": "@nrwl/node:execute",
+          "options": {
+            "buildTarget": "nest-app:build"
+          },
+          "configurations": {
+            "production": {
+              "buildTarget": "nest-app:build:production"
+            }
+          }
+        },
+        "lint": {
+          "executor": "@nrwl/linter:eslint",
+          "options": {
+            "lintFilePatterns": ["apps/nest-app/**/*.ts"]
+          }
+        }
+      }
+    }
+  }
+}
