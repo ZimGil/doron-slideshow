@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Autoplay, Virtual } from 'swiper/modules';
+import { Autoplay, Keyboard, Virtual } from 'swiper/modules';
 import { Swiper } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import { DoronSlide } from './SwiperSlide';
@@ -30,7 +30,7 @@ export const DoronSlider: React.FC = () => {
 
   return (
     <Swiper
-      modules={[Autoplay, Virtual]}
+      modules={[Autoplay, Keyboard, Virtual]}
       virtual={{
         enabled: true,
         addSlidesBefore: 5,
@@ -38,6 +38,7 @@ export const DoronSlider: React.FC = () => {
       }}
       lazyPreloadPrevNext={10}
       slidesPerView={1}
+      keyboard
       onReachEnd={handleReachEnd}
       // autoplay={{ delay: 1000 }}
     >
