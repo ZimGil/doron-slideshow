@@ -1,6 +1,8 @@
 import React, { createContext, useCallback, useEffect, useState } from "react";
 import { useSwiper } from "swiper/react";
 
+const AUTOPLAY_INTERVAL = 1000;
+
 interface AutoplayContextValue {
     isAutoplay: boolean;
     toggleAutoplay: () => void
@@ -31,7 +33,7 @@ export const AutoplayProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 if (swiper) {
                     swiper.slideNext();
                 }
-            }, 1000);
+            }, AUTOPLAY_INTERVAL);
         }
     }, [swiper, isAutoplay]);
 

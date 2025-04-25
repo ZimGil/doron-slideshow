@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { Virtual } from 'swiper/modules';
-import { Swiper } from 'swiper/react';
+import { EffectFade, Virtual } from 'swiper/modules';
+import { Swiper, SwiperClass } from 'swiper/react';
 import 'swiper/swiper-bundle.css';
 import { DoronSlide } from './SwiperSlide';
 import { DoronImage } from './Image';
@@ -26,21 +26,28 @@ export const DoronSlider: React.FC = () => {
     setPhotos((prev) => [...prev, ...newPhotos]);
   };
 
-  const handleReachEnd = () => {
-    fetchPhotos();
-  };
+  const fadeFixer = (swiper: SwiperClass) => {
+    swiper.slides.forEach(slide => {
+      // @ts-expect-error progress is not defined in swiper types for some reason
+      const p = Math.abs(slide.progress);
+      slide.style.opacity = `${1 - Math.min(p, 1)}`; // 1 → 0
+    });
+  }
 
   return (
     <Swiper
-      modules={[Virtual]}
+      modules={[EffectFade, Virtual]}
       virtual={{
         enabled: true,
         addSlidesBefore: 5,
         addSlidesAfter: 5
       }}
       lazyPreloadPrevNext={10}
+      effect='fade'
       slidesPerView={1}
-      onReachEnd={handleReachEnd}
+      speed={750}
+      onReachEnd={fetchPhotos}
+      onProgress={fadeFixer}
     >
 
       {photos.map(({ url, name }, idx) => (
