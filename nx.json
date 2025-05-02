@@ -102,5 +102,15 @@
     "test": {
       "dependsOn": ["^build"]
     }
+  },
+  "tasksRunnerOptions": {
+    "default": {
+      "runner": "nx/tasks-runners/default",
+      "options": {
+        "cacheableOperations": ["build", "lint", "test", "typecheck"],
+        "parallel": 3,
+        "maxParallel": 10
+      }
+    }
   }
 }
