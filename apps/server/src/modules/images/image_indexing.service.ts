@@ -3,7 +3,7 @@ import path from 'node:path';
 import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { FSWatcher, watch } from 'chokidar';
 import { Repository } from 'typeorm';
-import { chain } from 'lodash';
+import _, { chain } from 'lodash';
 import { Image } from './image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash } from 'node:crypto';
@@ -16,31 +16,24 @@ const HASH_FILE_NAME = '.dirhash';
 
 @Module({})
 export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
-  private readonly fileWatcher: FSWatcher;
+  private fileWatcher!: FSWatcher;
 
   constructor(
     @InjectRepository(Image)
     private readonly imagesRepository: Repository<Image>
-  ) {
-    this.fileWatcher = watch(ROOT_IMAGES_DIRECTORY, {
-      awaitWriteFinish: true,
-      ignoreInitial: true,
-    });
-
-    this.fileWatcher.on('add', (file) => this.handleFileAdded(file));
-    this.fileWatcher.on('unlink', (file) => this.handleFileRemoved(file));
-    this.fileWatcher.on('error', console.error); // @TODO - logger
-  }
+  ) {}
 
   async onModuleInit(): Promise<void> {
     await this.syncLastMonthsDirs();
+    await this.initFileWatcher();
   }
 
-  onModuleDestroy(): void {
-    this.fileWatcher.close();
+  async onModuleDestroy(): Promise<void> {
+    await this.stopFileWatcher();
   }
 
   async provision(): Promise<void> {
+    await this.stopFileWatcher();
     const yearDirs = await fs.readdir(ROOT_IMAGES_DIRECTORY, {
       withFileTypes: true,
     });
@@ -58,6 +51,25 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
       for (const monthDir of monthDirs) {
         await this.syncMonthDir(monthDir);
       }
+    }
+
+    await this.initFileWatcher();
+  }
+
+  private async initFileWatcher(): Promise<void> {
+    this.fileWatcher = watch(ROOT_IMAGES_DIRECTORY, {
+      awaitWriteFinish: true,
+      ignoreInitial: true,
+    });
+
+    this.fileWatcher.on('add', (file) => this.handleFileAdded(file));
+    this.fileWatcher.on('unlink', (file) => this.handleFileRemoved(file));
+    this.fileWatcher.on('error', console.error); // @TODO - logger
+  }
+
+  private async stopFileWatcher(): Promise<void> {
+    if (this.fileWatcher != null) {
+      this.fileWatcher.close();
     }
   }
 
