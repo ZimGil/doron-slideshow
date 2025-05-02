@@ -1,8 +1,9 @@
 import { Module } from '@nestjs/common'
+import { ConfigModule } from '@nestjs/config';
 import { ImageModule } from './modules/image/image.module';
 
 @Module({
-  imports: [ImageModule],
+  imports: [ConfigModule.forRoot(), ImageModule],
   controllers: [],
   providers: [],
 })

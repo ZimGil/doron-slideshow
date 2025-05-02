@@ -1,14 +1,15 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Inject, Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { FSWatcher, watch } from 'chokidar';
 import { Repository } from 'typeorm';
 import { chain } from 'lodash';
 import { Image } from './image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash } from 'node:crypto';
+import { ConfigService } from '@nestjs/config';
 
-const ROOT_IMAGES_DIRECTORY = ''; // TODO
+const DORON_IMAGES_LIBRARY_PATH = 'DORON_IMAGES_LIBRARY_PATH';
 const YEAR_DIRECTORY_NAME_REGEX = /Year (?<year>\d{4})/;
 const MONTH_DIRECTORY_NAME_REGEX =
   /(?<year>\d{4})\s\((?<month>\d{2})\)(?:[[:blank:]](?<dirName>[\w[:blank:]]+))?/;
@@ -20,7 +21,10 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
 
   constructor(
     @InjectRepository(Image)
-    private readonly imagesRepository: Repository<Image>
+    private readonly imagesRepository: Repository<Image>,
+
+    @Inject(ConfigService)
+    private readonly configService: ConfigService
   ) {}
 
   async onModuleInit(): Promise<void> {
@@ -34,7 +38,8 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
 
   async provision(): Promise<void> {
     await this.stopFileWatcher();
-    const yearDirs = await fs.readdir(ROOT_IMAGES_DIRECTORY, {
+    const libraryPath = this.configService.getOrThrow<string>(DORON_IMAGES_LIBRARY_PATH);
+    const yearDirs = await fs.readdir(libraryPath, {
       withFileTypes: true,
     });
 
@@ -57,7 +62,8 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async initFileWatcher(): Promise<void> {
-    this.fileWatcher = watch(ROOT_IMAGES_DIRECTORY, {
+    const libraryPath = this.configService.getOrThrow<string>(DORON_IMAGES_LIBRARY_PATH);
+    this.fileWatcher = watch(libraryPath, {
       awaitWriteFinish: true,
       ignoreInitial: true,
     });
@@ -178,7 +184,8 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
   private async getLestMonthsDirectories(
     numberOfMonths = 3
   ): Promise<string[]> {
-    const entries = await fs.readdir(ROOT_IMAGES_DIRECTORY, {
+    const libraryPath = this.configService.getOrThrow<string>(DORON_IMAGES_LIBRARY_PATH);
+    const entries = await fs.readdir(libraryPath, {
       withFileTypes: true,
     });
     const latestTwoYears = chain(entries)
