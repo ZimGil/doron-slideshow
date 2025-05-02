@@ -3,7 +3,7 @@ import path from 'node:path';
 import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { FSWatcher, watch } from 'chokidar';
 import { Repository } from 'typeorm';
-import _, { chain } from 'lodash';
+import { chain } from 'lodash';
 import { Image } from './image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { createHash } from 'node:crypto';
