@@ -1,9 +1,8 @@
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { Inject, Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import { Module, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
 import { FSWatcher, watch } from 'chokidar';
-import { DataSource, DeepPartial, Repository } from 'typeorm';
-import { IMAGES_DIR_PATH } from './constants';
+import { Repository } from 'typeorm';
 import { chain } from 'lodash';
 import { Image } from './image.entity';
 import { InjectRepository } from '@nestjs/typeorm';
