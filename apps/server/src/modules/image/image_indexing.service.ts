@@ -152,15 +152,23 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
     const lastMonthsDirs = await this.getLestMonthsDirectories();
 
     for (const monthDir of lastMonthsDirs) {
-      const storedFingerPrint = await fs.readFile(
-        path.join(monthDir, HASH_FILE_NAME),
-        'utf-8'
-      );
+      const storedFingerPrint = await this.getStoredFingerPrint(monthDir);
       const currentFingerPrint = await this.getMonthDirFingerprint(monthDir);
 
       if (storedFingerPrint != currentFingerPrint) {
         await this.syncMonthDir(monthDir);
       }
+    }
+  }
+
+  private async getStoredFingerPrint(
+    monthDirPath: string
+  ): Promise<string | null> {
+    try {
+      const hashFilePath = path.join(monthDirPath, HASH_FILE_NAME);
+      return await fs.readFile(hashFilePath, 'utf-8');
+    } catch (error) {
+      return null;
     }
   }
 
