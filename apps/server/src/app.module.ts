@@ -3,7 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ImageModule } from './modules/image/image.module';
 
 @Module({
-  imports: [ConfigModule.forRoot(), ImageModule],
+  imports: [ConfigModule.forRoot({ isGlobal: true }), ImageModule],
   controllers: [],
   providers: [],
 })

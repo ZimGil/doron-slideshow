@@ -115,15 +115,11 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
   private async getMonthDirFingerprint(monthDirPath: string): Promise<string> {
     const hash = createHash('sha256');
 
-    const files = await fs.readdir(monthDirPath, { withFileTypes: true });
+    const files = await fs.readdir(monthDirPath);
 
-    for (const file of files) {
-      const filePath = path.join(monthDirPath, file.name);
-      const stat = await fs.stat(filePath);
-      hash.update(filePath);
-      hash.update(stat.size.toString());
-      hash.update(stat.mtimeMs.toString());
-    }
+    files.forEach((file) => {
+      hash.update(file);
+    });
 
     return hash.digest('hex');
   }
