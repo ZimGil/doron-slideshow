@@ -149,9 +149,7 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async syncLastMonthsDirs(): Promise<void> {
-    const lastMonthsDirs = await this.getLestMonthsDirectories();
-
-    for (const monthDir of lastMonthsDirs) {
+    for (const monthDir of await this.getLestMonthsDirectories()) {
       const storedFingerPrint = await this.getStoredFingerPrint(monthDir);
       const currentFingerPrint = await this.getMonthDirFingerprint(monthDir);
 
