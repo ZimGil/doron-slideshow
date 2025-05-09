@@ -9,8 +9,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { chain } from 'lodash';
 import { faker } from '@faker-js/faker';
+import { ImageIndexingService } from '../image_indexing.service';
 
 const DORON_IMAGES_LIBRARY_PATH = 'DORON_IMAGES_LIBRARY_PATH';
+const IMAGE_INDEXING_MONTHS = 'IMAGE_INDEXING_MONTHS';
 jest.mock('chokidar', () => ({
   watch: jest.fn(() => ({
     on: jest.fn(),
@@ -20,6 +22,8 @@ jest.mock('chokidar', () => ({
 
 describe('ImageIndexingService', () => {
   let app: TestingModule;
+  let service: ImageIndexingService;
+  let configService: ConfigService;
 
   beforeAll(async () => {
     app = await Test.createTestingModule({
@@ -43,7 +47,8 @@ describe('ImageIndexingService', () => {
       ],
     }).compile();
 
-    await app.init();
+    service = app.get<ImageIndexingService>(ImageIndexingService);
+    configService = app.get<ConfigService>(ConfigService);
   });
 
   afterAll(async () => {
@@ -62,22 +67,17 @@ describe('ImageIndexingService', () => {
     async function computeDirHash(dir: string): Promise<string> {
       const hash = createHash('sha256');
       const files = await fs.readdir(dir);
-      files.forEach((file) => {
+      files.filter((file) => file !== '.dirhash').forEach((file) => {
         hash.update(file);
       });
       return hash.digest('hex');
     }
 
     beforeAll(async () => {
-      jest.spyOn(ConfigService.prototype, 'getOrThrow').mockImplementation((key: string) => {
-        if (key === DORON_IMAGES_LIBRARY_PATH) {
-          return tempLibraryPath;
-        }
-        throw new Error(`Unexpected config key: ${key}`);
-      });
+      tempLibraryPath =
+        await fs.mkdir(path.join(process.cwd(), 'tmp', 'test-library-'), { recursive: true })
+        ?? os.tmpdir();
 
-      tempLibraryPath = await fs.mkdtemp(path.join(os.tmpdir(), 'test-library-'));
-      
       const numLibraries = faker.number.int({ min: 5, max: 10 });
       for (let i = 0; i < numLibraries; i++) {
          const year = faker.number.int({ min: 2000, max: 2030 });
@@ -106,6 +106,17 @@ describe('ImageIndexingService', () => {
         .orderBy((dir) => dir, 'desc')
         .take(faker.number.int({min: 3, max: Math.max(3, numLibraries)}))
         .value();
+
+        jest.spyOn(configService, 'getOrThrow').mockImplementation((key: string) => {
+          if (key === DORON_IMAGES_LIBRARY_PATH) {
+            return tempLibraryPath;
+          } else if (key === IMAGE_INDEXING_MONTHS) {
+            return testedDirs.length;
+          }
+          throw new Error(`Unexpected config key: ${key}`);
+        });
+
+      console.log('testedDirs', testedDirs);
 
       const DirectoryState = {
         UP_TO_DATE: 'upToDate',
@@ -143,6 +154,18 @@ describe('ImageIndexingService', () => {
 
     afterAll(async () => {
       await fs.rm(tempLibraryPath, { recursive: true, force: true });
+    });
+
+    describe('onModuleInit', () => {
+      it('should sync the last months directories', async () => {
+        await service.onModuleInit();
+
+        for (const dir of testedDirs) {
+          const expectedHash = await computeDirHash(dir);
+          const actualHash = await fs.readFile(path.join(dir, '.dirhash'), 'utf-8');
+          expect(actualHash).toBe(expectedHash);
+        }
+      });
     });
   });
 });

@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { ConfigService } from '@nestjs/config';
 
 const DORON_IMAGES_LIBRARY_PATH = 'DORON_IMAGES_LIBRARY_PATH';
+const IMAGE_INDEXING_MONTHS = 'IMAGE_INDEXING_MONTHS';
 const YEAR_DIRECTORY_NAME_REGEX = /Year (?<year>\d{4})/;
 const MONTH_DIRECTORY_NAME_REGEX =
   /(?<year>\d{4})\s\((?<month>\d{2})\)(?:[[:blank:]](?<dirName>[\w[:blank:]]+))?/;
@@ -105,9 +106,12 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async hashDir(filePath: string): Promise<void> {
-    const monthDirPath = filePath.split(path.sep).slice(0, -1).join(path.sep);
+    console.log('hashing dir', filePath);
+    // const monthDirPath = filePath.split(path.sep).slice(0, -1).join(path.sep);
     const figerpring = await this.getMonthDirFingerprint(filePath);
-    const hashFilePath = path.join(monthDirPath, HASH_FILE_NAME);
+    const hashFilePath = path.join(filePath, HASH_FILE_NAME);
+
+    console.log({hashFilePath});
 
     await fs.writeFile(hashFilePath, figerpring, 'utf-8');
   }
@@ -117,7 +121,7 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
 
     const files = await fs.readdir(monthDirPath);
 
-    files.forEach((file) => {
+    files.filter((file) => file !== HASH_FILE_NAME).forEach((file) => {
       hash.update(file);
     });
 
@@ -149,9 +153,19 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async syncLastMonthsDirs(): Promise<void> {
-    for (const monthDir of await this.getLestMonthsDirectories()) {
+    const lastMonthsDirs = await this.getLestMonthsDirectories()
+    console.log('ImageIndexingService::syncLastMonthsDirs', {
+      lastMonthsDirs
+    });
+    for (const monthDir of lastMonthsDirs) {
       const storedFingerPrint = await this.getStoredFingerPrint(monthDir);
       const currentFingerPrint = await this.getMonthDirFingerprint(monthDir);
+
+      console.log('ImageIndexingService::syncLastMonthsDirs::file', {
+        storedFingerPrint,
+        currentFingerPrint,
+        monthDir
+      });
 
       if (storedFingerPrint != currentFingerPrint) {
         await this.syncMonthDir(monthDir);
@@ -165,12 +179,13 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
     try {
       const hashFilePath = path.join(monthDirPath, HASH_FILE_NAME);
       return await fs.readFile(hashFilePath, 'utf-8');
-    } catch (error) {
+    } catch (_) {
       return null;
     }
   }
 
   private async syncMonthDir(monthDirPath: string): Promise<void> {
+    console.log('syncing month dir', monthDirPath);
     const files = await fs.readdir(monthDirPath);
 
     const imageEntries = chain(files)
@@ -183,13 +198,14 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
     await this.hashDir(monthDirPath);
   }
 
-  private async getLestMonthsDirectories(
-    numberOfMonths = 3
-  ): Promise<string[]> {
+  private async getLestMonthsDirectories(): Promise<string[]> {
+    const numberOfMonths = this.configService.getOrThrow<number>(IMAGE_INDEXING_MONTHS);
     const libraryPath = this.configService.getOrThrow<string>(DORON_IMAGES_LIBRARY_PATH);
     const entries = await fs.readdir(libraryPath, {
       withFileTypes: true,
     });
+    // TODO - need to make sure we get numberOfMonths as clsoe as possible to the requested number
+    // TODO - recursive?
     const latestTwoYears = chain(entries)
       .filter((entry) => entry.isDirectory())
       .orderBy('name', 'desc')
