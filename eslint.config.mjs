@@ -14,6 +14,12 @@ export default [
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
     rules: {
+      'max-len': [
+        'error',
+        {
+          code: 120,
+        },
+      ],
       '@nx/enforce-module-boundaries': [
         'error',
         {
