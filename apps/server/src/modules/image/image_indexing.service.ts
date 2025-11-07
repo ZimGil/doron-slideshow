@@ -118,7 +118,6 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
 
   private async getMonthDirFingerprint(monthDirPath: string): Promise<string> {
     const hash = createHash('sha256');
-
     const files = await fs.readdir(monthDirPath);
 
     files.filter((file) => file !== HASH_FILE_NAME).forEach((file) => {
@@ -135,13 +134,13 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
     filename: string;
     dirName: string;
   } | null {
-    const foo = MONTH_DIRECTORY_NAME_REGEX.exec(filePath);
-    if (foo?.groups == null) return null;
+    const match = MONTH_DIRECTORY_NAME_REGEX.exec(filePath);
+    if (match?.groups == null) return null;
     const extension = path.extname(filePath);
     const filename = path.basename(filePath, extension);
     const dirName = path.dirname(filePath);
 
-    const { year, month } = foo.groups;
+    const { year, month } = match.groups;
 
     return {
       year: Number(year),
@@ -179,13 +178,15 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
     try {
       const hashFilePath = path.join(monthDirPath, HASH_FILE_NAME);
       return await fs.readFile(hashFilePath, 'utf-8');
-    } catch (_) {
+    } catch (error) {
+      console.error('Error reading hash file', { error, monthDirPath });
+
       return null;
     }
   }
 
   private async syncMonthDir(monthDirPath: string): Promise<void> {
-    console.log('syncing month dir', monthDirPath);
+    console.log('syncing month dir', { monthDirPath });
     const files = await fs.readdir(monthDirPath);
 
     const imageEntries = chain(files)
