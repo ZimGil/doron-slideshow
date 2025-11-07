@@ -107,7 +107,6 @@ export class ImageIndexingService implements OnModuleInit, OnModuleDestroy {
 
   private async hashDir(filePath: string): Promise<void> {
     console.log('hashing dir', filePath);
-    // const monthDirPath = filePath.split(path.sep).slice(0, -1).join(path.sep);
     const figerpring = await this.getMonthDirFingerprint(filePath);
     const hashFilePath = path.join(filePath, HASH_FILE_NAME);
 
