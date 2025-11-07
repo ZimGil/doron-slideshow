@@ -1,9 +1,9 @@
 import  { Column, DeleteDateColumn, Entity, Index, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity()
-@Index('image_year_month_index', ['year', 'month', 'filename'])
+@Index('image_year_month_filename_index', ['year', 'month', 'filename'])
 export class Image {
-  @PrimaryGeneratedColumn()
+  @PrimaryGeneratedColumn('increment')
   public readonly id!: number;
 
   @Column()
